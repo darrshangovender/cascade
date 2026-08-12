@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="1000" height="620" fill="url(#bg)"/>
+
+  <text x="60" y="54" fill="#e6edf3" font-size="26" font-weight="700">cascade — accuracy vs cost per query</text>
+  <text x="60" y="82" fill="#7d8590" font-size="14">200-item benchmark · offline MockLLM · reproducible with `python benchmarks/run.py`</text>
+
+  <!-- Axes -->
+  <line x1="120" y1="520" x2="920" y2="520" stroke="#30363d" stroke-width="1.5"/>
+  <line x1="120" y1="120" x2="120" y2="520" stroke="#30363d" stroke-width="1.5"/>
+  <text x="520" y="575" fill="#7d8590" font-size="14" text-anchor="middle">cost per query (USD, ×10⁻⁴)</text>
+  <text x="60" y="320" fill="#7d8590" font-size="14" text-anchor="middle" transform="rotate(-90 60 320)">accuracy</text>
+
+  <!-- Y gridlines: accuracy 0.6→1.0 mapped 520→120 -->
+  <g stroke="#21262d" stroke-width="1" stroke-dasharray="3,4">
+    <line x1="120" y1="420" x2="920" y2="420"/>
+    <line x1="120" y1="320" x2="920" y2="320"/>
+    <line x1="120" y1="220" x2="920" y2="220"/>
+  </g>
+  <g fill="#7d8590" font-size="12" text-anchor="end">
+    <text x="112" y="524">60%</text>
+    <text x="112" y="424">70%</text>
+    <text x="112" y="324">80%</text>
+    <text x="112" y="224">90%</text>
+    <text x="112" y="124">100%</text>
+  </g>
+  <!-- X ticks: cost 0 → 3.6e-4 mapped 120→920 -->
+  <g fill="#7d8590" font-size="12" text-anchor="middle">
+    <text x="120" y="540">0</text>
+    <text x="320" y="540">0.9</text>
+    <text x="520" y="540">1.8</text>
+    <text x="720" y="540">2.7</text>
+    <text x="900" y="540">3.6</text>
+  </g>
+
+  <!-- points: x = 120 + cost/3.6e-4*780 ; y = 520 - (acc-0.6)/0.4*400 -->
+  <!-- cheap-only: acc .61 cost .003e-4 -> x~120 y~510 -->
+  <circle cx="127" cy="510" r="7" fill="#475569"/>
+  <text x="140" y="514" fill="#94a3b8" font-size="13">cheap-only  61% · $0.000003</text>
+
+  <!-- mid-only: acc .80 cost .70e-4 -> x=120+ (0.7/3.6*780)=272 ; y=520-(.2/.4*400)=320 -->
+  <circle cx="272" cy="320" r="7" fill="#6366f1"/>
+  <text x="286" y="324" fill="#a5b4fc" font-size="13">mid-only  80% · $0.000070</text>
+
+  <!-- cascade: acc .88 cost 2.31e-4 -> x=120+(2.31/3.6*780)=620 ; y=520-(.28/.4*400)=240 -->
+  <circle cx="620" cy="240" r="10" fill="#22c55e"/>
+  <text x="500" y="212" fill="#86efac" font-size="15" font-weight="700" text-anchor="middle">cascade  88% · $0.000231</text>
+
+  <!-- strong-only: acc .935 cost 3.51e-4 -> x=120+(3.51/3.6*780)=880 ; y=520-(.335/.4*400)=185 -->
+  <circle cx="880" cy="185" r="8" fill="#a855f7"/>
+  <text x="866" y="168" fill="#d8b4fe" font-size="13" text-anchor="end">strong-only  93.5% · $0.000351</text>
+
+  <!-- savings annotation: from strong to cascade -->
+  <line x1="620" y1="240" x2="880" y2="185" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <rect x="648" y="270" width="230" height="52" rx="8" fill="#0f291a" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="763" y="294" fill="#86efac" font-size="15" font-weight="700" text-anchor="middle">−34% cost</text>
+  <text x="763" y="313" fill="#7d8590" font-size="12" text-anchor="middle">at 94% of strong accuracy</text>
+
+  <text x="120" y="605" fill="#7d8590" font-size="12">github.com/darrshangovender/cascade · MIT · verifier-gated model cascades with an offline threshold optimizer</text>
+</svg>
