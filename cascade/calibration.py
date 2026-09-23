@@ -54,7 +54,12 @@ def _grade(answer: str, gold: str) -> bool:
     """Loose correctness check used for calibration + benchmarking."""
     a = answer.strip().lower()
     g = gold.strip().lower()
-    return g in a or a in g or a == g
+    # An empty answer must never grade correct: "" is a substring of every gold,
+    # so ``a in g`` used to fire unconditionally and a model that returned
+    # nothing counted as a hit — inflating every accuracy number downstream.
+    if not a or not g:
+        return False
+    return g in a or a in g
 
 
 def evaluate_thresholds(
