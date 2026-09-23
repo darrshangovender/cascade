@@ -162,8 +162,11 @@ def _extract_candidate(prompt: str) -> str:
 
 
 def _loose_match(a: str, gold: str) -> bool:
+    # Both sides must be non-empty: "" is a substring of every gold, so an
+    # unparseable candidate used to match anything and the grader role-play
+    # would report it as correct.
     a, g = a.strip().lower(), gold.strip().lower()
-    return bool(g) and (g in a or a in g or a == g)
+    return bool(a) and bool(g) and (g in a or a in g)
 
 
 def _logistic(x: float) -> float:
@@ -173,10 +176,23 @@ def _logistic(x: float) -> float:
 
 
 def _plausible_wrong(gold: str, seed: int) -> str:
-    """Produce a deterministic wrong-but-plausible answer."""
-    if gold.strip().lstrip("-").isdigit():
-        return str(int(gold) + (1 if seed % 2 else -1))
-    return f"{gold} (incorrect variant {seed % 97})"
+    """Produce a deterministic wrong-but-plausible answer.
+
+    The result must not *contain* the gold string. Every grader here matches
+    loosely (substring in either direction), so decorating the gold — the old
+    ``f"{gold} (incorrect variant N)"`` — was scored *correct*, which meant the
+    mock could not simulate a wrong answer at all on non-numeric golds and any
+    accuracy measured over such a set came out near 100%.
+    """
+    g = gold.strip()
+    if g.lstrip("-").isdigit():
+        return str(int(g) + (1 if seed % 2 else -1))
+    if not g:
+        return "[no answer]"
+    # Replace the final character rather than appending to the gold, so the
+    # result is the same shape and length but is not a superstring of it.
+    alts = [c for c in "xyzq" if c != g[-1].lower()]
+    return f"{g[:-1]}{alts[seed % len(alts)]}"
 
 
 class AnthropicLLM:
