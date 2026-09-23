@@ -1,8 +1,6 @@
+from cascade.policy import AlwaysAcceptPolicy, ThresholdPolicy
 from cascade.router import Router
-from cascade.policy import ThresholdPolicy, AlwaysAcceptPolicy
 from cascade.types import Difficulty
-
-from tests.conftest import three_tiers  # noqa: F401 (fixture)
 
 
 def test_router_returns_result(three_tiers):
