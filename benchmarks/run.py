@@ -21,12 +21,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from benchmarks.dataset import make_dataset
+from cascade.calibration import CalibrationItem, _grade, calibrate, evaluate_thresholds
 from cascade.cascade import Cascade, Tier
-from cascade.calibration import CalibrationItem, calibrate, evaluate_thresholds, _grade
 from cascade.llm import MockLLM
 from cascade.verifiers import ConsistencyVerifier, RuleVerifier, SelfCheckVerifier
-
-from benchmarks.dataset import make_dataset
 
 # Skills span a wide range so each tier adds real accuracy on harder items.
 CHEAP = lambda: MockLLM("gpt-4o-mini", 0, skill=0.40)
