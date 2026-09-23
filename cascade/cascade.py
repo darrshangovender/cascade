@@ -18,10 +18,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from cascade.budget import Budget, BudgetExceeded
+from cascade.llm import LLM
 from cascade.policy import Policy
 from cascade.types import Query, RouteResult, Step
 from cascade.verifiers.base import Verifier
-from cascade.llm import LLM
 
 
 @dataclass
@@ -57,6 +57,7 @@ class Cascade:
 
         steps: list[Step] = []
         best_step: Step | None = None
+        breach: BudgetExceeded | None = None
 
         for idx in range(entry, len(self.tiers)):
             tier = self.tiers[idx]
@@ -67,7 +68,8 @@ class Cascade:
                 verdict = tier.verifier.verify(query, resp)
                 # Charge the verifier's own LLM spend (0 for rule-based).
                 budget.charge(verdict.cost_usd, 0.0, count=False)
-            except BudgetExceeded:
+            except BudgetExceeded as exc:
+                breach = exc
                 break
 
             accepted = self.policy.accept(idx, verdict, is_last)
@@ -78,6 +80,13 @@ class Cascade:
 
             if accepted:
                 return self._result(query, steps, winning=step)
+
+        if not steps:
+            # The budget tripped before any tier produced a verdict, so there is
+            # no "best answer so far" to fall back on. Surface the breach rather
+            # than returning a RouteResult with an empty answer, which the caller
+            # would have no way to tell apart from a model that said nothing.
+            raise breach if breach is not None else BudgetExceeded("no tier ran")
 
         # Escalation exhausted or budget hit — return the highest-confidence step.
         winning = best_step or steps[-1]
