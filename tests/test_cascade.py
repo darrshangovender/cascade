@@ -3,8 +3,7 @@ from cascade.cascade import Cascade, Tier
 from cascade.llm import MockLLM
 from cascade.policy import AlwaysAcceptPolicy, ThresholdPolicy
 from cascade.types import Query
-from cascade.verifiers import RuleVerifier, SelfCheckVerifier
-
+from cascade.verifiers import RuleVerifier
 from tests.conftest import gold_query
 
 
@@ -67,3 +66,18 @@ def test_empty_cascade_raises():
 
     with pytest.raises(ValueError):
         Cascade([], AlwaysAcceptPolicy())
+
+
+def test_budget_breach_before_any_tier_raises_not_crashes():
+    """A budget too small for even one call left `steps` empty, and the
+    exhaustion path did `steps[-1]` — an IndexError instead of a decision.
+    There is no 'best answer so far' here, so the breach must surface."""
+    from cascade.budget import BudgetExceeded
+
+    tiers = [Tier(MockLLM("gpt-4o-mini", 0, 0.3), RuleVerifier())]
+    casc = Cascade(tiers, ThresholdPolicy([0.0]))
+    with pytest.raises(BudgetExceeded):
+        casc.run(gold_query("q", "a", 0.5), budget=Budget(max_calls=0))
+
+
+import pytest  # noqa: E402  (kept beside the test that needs it)
