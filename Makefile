@@ -1,22 +1,16 @@
-.PHONY: install test quickstart calibrate benchmark lint clean
+.PHONY: install test lint bench clean
 
 install:
 	pip install -e ".[dev]"
 
 test:
-	pytest tests/ -v
-
-quickstart:
-	python examples/quickstart.py
-
-calibrate:
-	python examples/calibration_demo.py
-
-benchmark:
-	python benchmarks/run.py
+	pytest tests/ -q
 
 lint:
 	ruff check .
 
+bench:
+	python benchmarks/run.py
+
 clean:
-	rm -rf .pytest_cache **/__pycache__ *.egg-info benchmarks/results.json
+	rm -rf .pytest_cache **/__pycache__ *.egg-info .ruff_cache
