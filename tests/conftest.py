@@ -4,7 +4,7 @@ import pytest
 
 from cascade.cascade import Tier
 from cascade.llm import MockLLM
-from cascade.verifiers import RuleVerifier, SelfCheckVerifier, JudgeVerifier
+from cascade.verifiers import JudgeVerifier, RuleVerifier, SelfCheckVerifier
 
 
 @pytest.fixture
