@@ -38,11 +38,19 @@ class ConsistencyVerifier(Verifier):
             answers.append(_norm(r.text))
             extra_cost += r.cost_usd
         counts = Counter(answers)
-        modal, modal_count = counts.most_common(1)[0]
-        agreement = modal_count / len(answers)
+        modal, _modal_count = counts.most_common(1)[0]
+        candidate = _norm(response.text)
+        # Confidence is the support for *this* candidate, not for whatever the
+        # modal answer happens to be. Reporting the modal share meant a candidate
+        # the other samples contradicted (say 1 vote against 4) still carried
+        # confidence 0.8 — and the cascade picks its winner by confidence, so an
+        # exhausted route could return the answer its own verifier had rejected.
+        # When the candidate *is* modal the two are identical, so the accept path
+        # is unchanged.
+        agreement = counts[candidate] / len(answers)
         # The candidate is accepted only if it *is* the modal answer AND
         # agreement clears the threshold.
-        passed = _norm(response.text) == modal and agreement >= self.accept_threshold
+        passed = candidate == modal and agreement >= self.accept_threshold
         reason = f"agreement={agreement:.2f} over {len(answers)} samples"
         return self._tag(Verdict(passed, agreement, reason, cost_usd=extra_cost))
 
