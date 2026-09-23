@@ -73,3 +73,36 @@ def test_judge_scores():
     v = JudgeVerifier(judge)
     verdict = v.verify(Query("What is 2+2? [GOLD:4||0.05]"), _resp("4"))
     assert verdict.verifier == "judge"
+
+
+def test_consistency_confidence_tracks_the_candidate_not_the_mode():
+    """A candidate the samples contradict must not inherit the modal answer's
+    agreement. It used to: 1-of-5 support reported confidence 0.8, and the
+    cascade picks its winner by confidence."""
+
+    class _Fixed:
+        model, tier = "m", 0
+
+        def __init__(self, text: str) -> None:
+            self.text = text
+
+        def complete(self, prompt: str, system: str | None = None) -> LLMResponse:
+            return LLMResponse(self.text, "m", 0, 10, 5, 0.0)
+
+    v = ConsistencyVerifier(_Fixed("8"), n=5)
+    verdict = v.verify(Query("q"), _resp("7"))
+    assert not verdict.passed
+    assert verdict.confidence == 0.2   # 1 of 5 samples backs "7", not 4 of 5
+
+
+def test_consistency_confidence_unchanged_when_candidate_is_modal():
+    class _Fixed:
+        model, tier = "m", 0
+
+        def complete(self, prompt: str, system: str | None = None) -> LLMResponse:
+            return LLMResponse("7", "m", 0, 10, 5, 0.0)
+
+    v = ConsistencyVerifier(_Fixed(), n=5)
+    verdict = v.verify(Query("q"), _resp("7"))
+    assert verdict.passed
+    assert verdict.confidence == 1.0
