@@ -5,7 +5,7 @@ Runs fully offline with MockLLM — no API keys required.
     python examples/quickstart.py
 """
 
-from cascade import Router, Tier, ThresholdPolicy
+from cascade import Router, ThresholdPolicy, Tier
 from cascade.llm import MockLLM
 from cascade.verifiers import ConsistencyVerifier, RuleVerifier, SelfCheckVerifier
 
