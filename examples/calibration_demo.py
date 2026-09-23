@@ -6,8 +6,8 @@ hits the target.
     python examples/calibration_demo.py
 """
 
-from cascade.cascade import Cascade, Tier
 from cascade.calibration import CalibrationItem, calibrate
+from cascade.cascade import Cascade, Tier
 from cascade.llm import MockLLM
 from cascade.verifiers import ConsistencyVerifier, RuleVerifier, SelfCheckVerifier
 
