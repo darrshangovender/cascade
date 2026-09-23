@@ -7,9 +7,9 @@ from cascade.verifiers.rules import RuleVerifier
 from cascade.verifiers.self_check import SelfCheckVerifier
 
 __all__ = [
-    "Verifier",
-    "RuleVerifier",
-    "SelfCheckVerifier",
     "ConsistencyVerifier",
     "JudgeVerifier",
+    "RuleVerifier",
+    "SelfCheckVerifier",
+    "Verifier",
 ]
