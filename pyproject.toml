@@ -5,7 +5,7 @@ description = "Route each LLM call to the cheapest model that will get it right 
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "Darrshan Govender", email = "darrshan@agulhascode.co.za" }]
+authors = [{ name = "Darrshan Govender", email = "darrshangovender@gmail.com" }]
 keywords = ["llm", "inference", "routing", "model-cascade", "cost-optimization", "verification"]
 
 dependencies = []
@@ -40,3 +40,8 @@ pythonpath = ["."]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+
+[tool.ruff.lint]
+# E402 stays on so the deliberate `# noqa: E402` markers in this repo remain
+# load-bearing: the flagged imports sit after runtime setup on purpose.
+extend-select = ["E402"]
